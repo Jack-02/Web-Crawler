@@ -1,6 +1,5 @@
 #深圳证券交易所
 
-import json
 import requests
 import re
 from datetime import date
