@@ -15,7 +15,7 @@ def collection(content: dict, sizelim: int, datelim: date, counter: int, destjso
         if counter == sizelim:
             print("---Crawling finished due to data-size limitation!---")
             return -1
-        title = re.sub('<.+>', '', item['announcementTitle'])
+        title = re.sub('<.+?>', '', item['announcementTitle'])
         pdfurl = 'http://static.cninfo.com.cn/'+item['adjunctUrl']
         currentdatestr = re.findall('/.{10}/', item['adjunctUrl'])[0][1:-1]
         currentdate = date.fromisoformat(currentdatestr)

@@ -11,7 +11,9 @@ import szse
 def get_order():
     '''Get order from user and return args.'''
     parser = argparse.ArgumentParser(
-        description='Get order including datasource, date, downloadpath(of a json file)')
+        description='''Get order including datasource, date, downloadpath(of a json file).
+        This program generates a file of json as a list, and its element form is as follows:
+        {'title': title, 'url': pdf_url,'publishdate': date_str,'src':source}''')
     parser.add_argument('--src', '-s', help='''The source website 1:cinfo(巨潮网), 2: shse(上交所), 3:szse(深交所), 0:all above. 
     Input the number before colon. Default 0''', type=int, default=0)
     parser.add_argument('--date', '-d', help='''Update the reports in the time frame from now to the assigned date. Example: 2021-01-23. Defalt update all''')
