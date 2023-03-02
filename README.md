@@ -10,6 +10,8 @@
 
 > 功能及使用方法
 
+- 使用前在项目根目录输入 `pip install -r requirements.txt` 获得该项目依赖的非python内置库（srds这里只有一个库）
+
 - 该爬虫程序会以 `json` 文件的形式收集每篇报告的基本信息，包括标题、发布日期、`pdf` 的 `url` 以及来源网站。具体地，该 `json` 若干个字典组成的列表。每个字典形如：`{'title': title, 'url': pdf_url,'publishdate': date_str,'src':source}`
 - 在当前目录下运行 `python get_data.py -h` 可以得到详细的命令行参数使用说明。支持选择文章的网页来源（可选）、日期范围（可选）和 `json` 的下载路径（必选）:
 

@@ -1,9 +1,10 @@
+# 爬虫使用入口
+
 import json
-import requests
-import re
 from datetime import date
 import argparse
 
+#同目录下的网页爬取方法
 import cinfo
 import shse
 import szse
