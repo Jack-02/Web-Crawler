@@ -47,8 +47,7 @@ def main():
         print('WRONG INPUT!!')
         return 
    
-    # with open(path,'w+',encoding='utf-8') as f :
-    with open(f'../totaldata.json','w+',encoding='utf-8') as f :
+    with open(path,'w+',encoding='utf-8') as f :
         json.dump(totaldata,f,ensure_ascii=False)
 
 if __name__=='__main__':

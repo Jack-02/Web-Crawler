@@ -3,6 +3,8 @@
 import requests
 import re
 from datetime import date
+import time
+from tqdm import tqdm
 
 
 def collection(content: dict, sizelim: int, datelim: date, counter: int, destjson: list):
@@ -20,13 +22,11 @@ def collection(content: dict, sizelim: int, datelim: date, counter: int, destjso
         currentdate = date.fromisoformat(currentdatestr)
         if datelim > currentdate:
             print("---Crawling finished due to ending-date limitation!---")
-            print(currentdate)
             return -1
 
         data = {'title': title, 'url': pdfurl,'publishdate': currentdatestr,'src':'cinfo'}
         destjson.append(data)
         counter += 1
-        print(counter, data)
     return counter
 
 
@@ -34,14 +34,19 @@ def visit(destjson:list, stopdate: date):
     '''巨潮网网页爬取'''
 
     typedic = {'shj': 358, 'hke': 5559}
+    typename={'shj': '深沪京部分', 'hke': '港股部分'}
     for type in typedic:
-        print('---------------------------------------')
-        print(type)
         counter = 0
         pagenum = typedic[type]//10 if typedic[type] % 10 else typedic[type]//10 + 1
         page = 1
+        errortimes=0
+        pbar = tqdm(total=pagenum,desc=f"巨潮网中{typename[type]}")
         while page <= pagenum:
             try:
+                 #冷却1秒
+                time.sleep(1)
+
+                #开始请求
                 url = f"http://www.cninfo.com.cn/new/fulltextSearch/full?searchkey=%E7%8E%AF%E5%A2%83+%E7%A4%BE%E4%BC%9A%E5%8F%8A&sdate=&edate=&isfulltext=false&sortName=pubdate&sortType=desc&pageNum={page}&type={type}"
 
                 headers = {
@@ -56,10 +61,30 @@ def visit(destjson:list, stopdate: date):
                     'X-Requested-With': 'XMLHttpRequest'
                 }
                 resp = requests.get(url, headers=headers)
+
+                #信息处理
                 content = resp.json()
                 counter = collection(content, typedic[type], stopdate, counter, destjson)
+
+                #达到要求，退出
                 if counter == -1:
+                    pbar.close
                     break
                 page += 1
+                pbar.update(1)
+                errortimes=0
+
+            except KeyboardInterrupt:
+                print("您已终止巨潮网爬取")
+                pbar.close
+                return
+    
             except BaseException as e:
-                print('远程主机强迫关闭了一个现有的连接。但是没关系，本页重来！')
+                #请求失败
+                errortimes+=1
+
+            #同页请求多次出错，跳过
+            if errortimes==10:
+                page+=1
+                errortimes=0
+        pbar.close

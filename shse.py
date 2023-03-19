@@ -4,7 +4,8 @@ import json
 import requests
 import re
 from datetime import date
-
+import time
+from tqdm import tqdm
 
 def collection(content: dict, sizelim: int, datelim: date, counter: int, destjson: list):
     '''上交所的信息提取方法'''
@@ -21,12 +22,10 @@ def collection(content: dict, sizelim: int, datelim: date, counter: int, destjso
         currentdate = date.fromisoformat(currentdatestr)
         if datelim > currentdate:
             print("---Crawling finished due to ending-date limitation!---")
-            print(currentdate)
             return -1
         data = {'title': title, 'url': pdfurl,'publishdate': currentdatestr,'src':'shse'}
         destjson.append(data)
         counter += 1
-        print(counter, data)
     return counter
 
 
@@ -34,10 +33,17 @@ def visit(destjson: list, stopdate: date):
     '''上交所网页爬取'''
 
     maxnum=217
+    pagenum=22
     page=1
     counter=0
-    while page<=22:
+    errortimes=0
+    pbar = tqdm(total=pagenum,desc=f"上交所官网")
+    while page<=pagenum:
         try:
+            #冷却1秒
+            time.sleep(1)
+
+            #开始请求
             url = f'http://query.sse.com.cn/search/getSearchResult.do?search=qwjs&jsonCallBack=jsonpCallback89910378&searchword=T_L+CTITLE+T_E+T_L%E7%8E%AF%E5%A2%83%E3%80%81%E7%A4%BE%E4%BC%9A%E5%8F%8A+T_R+and+cchannelcode+T_E+T_L0T_D8311T_D8348T_D8349T_D8365T_D9856T_D9860T_D9862T_D12002T_D88888888T_RT_R&orderby=-CRELEASETIME&page={page}&perpage=10&_=1677475917888'
             headers = {
                 'Accept': '*/*',
@@ -51,14 +57,35 @@ def visit(destjson: list, stopdate: date):
             }
             resp = requests.get(url=url, headers=headers)
             jsonpcb = resp.text
+
             #将jsonpCallback转为json
             filter = re.findall("(jsonpCallback.*?\().+", jsonpcb)[0]
             content = json.loads(jsonpcb[len(filter):-1])
-            counter = collection(content, maxnum, stopdate, counter, destjson)
-            if counter == -1:
-                break
-                page += 1 
-        except BaseException as e:
-            print('远程主机强迫关闭了一个现有的连接。但是没关系，本页重来！')
 
+            #信息处理
+            counter = collection(content, maxnum, stopdate, counter, destjson)
+
+            #达到要求，退出
+            if counter == -1:
+                pbar.close
+                break
+
+            page += 1 
+            pbar.update(1)
+            errortimes=0
+        
+        except KeyboardInterrupt:
+            print("您已终止上交所爬取")
+            pbar.close
+            return
+
+        except BaseException as e:
+            #请求失败
+            errortimes+=1
+        
+        #同页请求多次出错，跳过
+        if errortimes==10:
+            page+=1
+            errortimes=0
+    pbar.close
         
