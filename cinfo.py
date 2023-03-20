@@ -24,7 +24,7 @@ def collection(content: dict, sizelim: int, datelim: date, counter: int, destjso
             print("---Crawling finished due to ending-date limitation!---")
             return -1
 
-        data = {'title': title, 'url': pdfurl,'publishdate': currentdatestr,'src':'cinfo'}
+        data = {'title': title, 'url': pdfurl,'publishdate': currentdatestr,'src':'cninfo'}
         destjson.append(data)
         counter += 1
     return counter
