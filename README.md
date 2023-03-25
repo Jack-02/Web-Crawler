@@ -47,6 +47,6 @@ python get_data.py -h
 python get_data.py --src SRC --date DATE --path PATH
 ```
 
-注意：这里的SRC、DATE和PATH分别指用户提供的参数值。
+注意：这里的`SRC`、`DATE`和`PATH`分别指用户提供的参数值。
 
-本爬虫程序会以JSON文件的形式收集每篇报告的基本信息，包括标题、发布日期、PDF的URL以及来源网站。具体地，该JSON由若干个字典组成的列表构成。每个字典形如：`{'title': title, 'url': pdf_url,'publishdate': date_str,'src':source}`。
+本爬虫程序会以`JSON`文件的形式收集每篇报告的基本信息，包括标题、发布日期、报告的`URL`以及来源网站。具体地，该`JSON`由若干个字典组成的列表构成。每个字典形如：`{'title': title, 'url': pdf_url,'publishdate': date_str,'src':source}`。
